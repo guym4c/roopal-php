@@ -1,0 +1,19 @@
+{
+    "name": "guym4c/roopal-php",
+    "description": "Parses food delivery courier invoices",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Guy Mac",
+            "email": "hello@guymac.eu"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "ramsey/uuid": "^3.8",
+        "moontoast/math": "^1.1",
+        "league/csv": "^9.1",
+        "smalot/pdfparser": "^0.14.0"
+    }
+}

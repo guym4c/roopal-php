@@ -1,0 +1,6 @@
+/.idea/
+/var/
+/vendor/
+composer.lock
+/*.php
+/.htaccess
