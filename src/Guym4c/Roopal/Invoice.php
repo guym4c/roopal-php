@@ -14,6 +14,8 @@ use SplTempFileObject;
 
 class Invoice {
 
+    const CSV_DATETIME_FORMAT = 'Y-m-d H:i:s';
+
     /** @var string $id */
     private $id;
 
@@ -52,16 +54,7 @@ class Invoice {
         $pdf = (new Pdf\Parser())->parseFile($pathToPdf)->getText();
         $pdf = explode("\n", $pdf);
 
-        $matches = [];
-
-        // invoice id
-        $fileName = pathinfo($pathToPdf, PATHINFO_FILENAME);
-        $matched = preg_match('/[a-f0-9]{8}[-_][a-f0-9]{4}[-_]4[a-f0-9]{3}[-_][89ab][a-f0-9]{3}[-_][a-f0-9]{12}/', $fileName, $matches);
-        if ($matched) {
-            $this->id = $matches[0];
-        } else {
-            $this->id = Uuid::uuid4()->toString();
-        }
+        $this->id = Uuid::uuid4()->toString();
 
         $shiftsStart = -1;
         $shiftsFinish = -1;
@@ -69,6 +62,7 @@ class Invoice {
         $adjustmentsFinish = -1;
         $tips = null;
 
+        $matches = [];
         foreach ($pdf as $i => $line) {
 
             // rider
@@ -257,8 +251,8 @@ class Invoice {
                 $adjustment->toArray(),
                 [
                     'drops' => 0,
-                    'in'    => $this->getDateFrom()->format(DATE_ATOM),
-                    'out'   => $this->getDateTo()->format(DATE_ATOM),
+                    'in'    => $this->getDateFrom()->format(self::CSV_DATETIME_FORMAT),
+                    'out'   => $this->getDateTo()->format(self::CSV_DATETIME_FORMAT),
                 ]);
         }
 

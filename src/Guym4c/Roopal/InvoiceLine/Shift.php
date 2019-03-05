@@ -7,6 +7,7 @@ use DateTime;
 
 class Shift extends AbstractInvoiceLine {
 
+    const CSV_DATETIME_FORMAT = 'Y-m-d H:i:s';
     const CATEGORY_TYPE = 'shift';
 
     /** @var int $drops*/
@@ -85,8 +86,8 @@ class Shift extends AbstractInvoiceLine {
     public function toArray(): array {
         return array_merge(parent::toArray(), [
             'drops' => $this->getDrops(),
-            'in'    => $this->getTimeIn()->format(DateTime::ATOM),
-            'out'   => $this->getTimeOut()->format(DateTime::ATOM),
+            'in'    => $this->getTimeIn()->format(self::CSV_DATETIME_FORMAT),
+            'out'   => $this->getTimeOut()->format(self::CSV_DATETIME_FORMAT),
         ]);
     }
 
