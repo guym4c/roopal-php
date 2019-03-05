@@ -1,4 +1,4 @@
-# roopal-php
+# roopal-php ![Packagist](https://img.shields.io/packagist/v/guym4c/roopal-php.svg)
 
 Parses Deliveroo PDF invoices.
 
