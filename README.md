@@ -25,5 +25,8 @@ Compatibility could be broken at any time - if invoices are not parsing correctl
 
 This repo is maintained by the IWGB. If you have an invoice which breaks the parser, you can also email it to me, @guym4c, at [guymac@iwgb.co.uk](mailto:guymac@iwgb.co.uk) - invoices mailed to this address will be handled in strictest confidence under the IWGB's [Data Protection Policy](https://iwgb.org.uk/page/about/data-protection).
 
+# Hosted?
+IWGB Couriers Branch members can use this over the web on the IWGB website - contact a branch official to find out more. We're working on making this public once it's stable.
+
 *Putting Workers First*
 
