@@ -67,7 +67,7 @@ class Invoice {
         $shiftsFinish = -1;
         $adjustmentsStart = -1;
         $adjustmentsFinish = -1;
-        $tips = -1;
+        $tips = null;
 
         foreach ($pdf as $i => $line) {
 
@@ -105,8 +105,17 @@ class Invoice {
             }
         }
 
+        if ($shiftsFinish == -1) {
+            $shiftsFinish = array_search('Summary', $pdf) - 1;
+        }
+
+        $this->shifts = [];
+        $this->adjustments = [];
+
         $this->parseShifts(array_slice($pdf, $shiftsStart, $shiftsFinish - $shiftsStart + 1));
-        $this->parseAdjustments(array_slice($pdf, $adjustmentsStart, $adjustmentsFinish - $adjustmentsStart + 1), $pdf[$tips]);
+
+        $tips = $tips == null ? null : $pdf[$tips];
+        $this->parseAdjustments(array_slice($pdf, $adjustmentsStart, $adjustmentsFinish - $adjustmentsStart + 1), $tips);
     }
 
     /**
