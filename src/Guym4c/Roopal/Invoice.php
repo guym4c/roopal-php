@@ -84,7 +84,7 @@ class Invoice {
                 $this->dateTo = new DateTime($matches[2]);
             }
 
-            if ($line == 'Worked Orders Delivered Total') {
+            if (preg_match('/Worked Orders Delivered Total/', $line) {
                 $shiftsStart = $i + 1;
             }
 
