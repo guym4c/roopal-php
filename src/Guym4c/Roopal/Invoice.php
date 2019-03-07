@@ -72,25 +72,25 @@ class Invoice {
             }
 
             // Invoice dates
-            $matched = preg_match('/^Services provided - ([0-9]+[a-zA-Z\s]+[0-9]+) - ([0-9]+[a-zA-Z\s]+[0-9]+)$/', $line, $matches);
+            $matched = preg_match('/^Services provided - ([0-9]+[a-zA-Z\s]+[0-9]+) - ([0-9]+[a-zA-Z\s]+[0-9]+)/', $line, $matches);
             if ($matched) {
                 $this->dateFrom = new DateTime($matches[1]);
                 $this->dateTo = new DateTime($matches[2]);
             }
 
-            if (preg_match('/Worked Orders Delivered Total/', $line)) {
+            if (preg_match('/Worked\s+Orders\s+Delivered\s+Total/', $line)) {
                 $shiftsStart = $i + 1;
             }
 
-            if ($line == 'Fee Adjustments') {
+            if (preg_match( '/Fee\s+Adjustments/', $line)) {
                 $shiftsFinish = $i - 1;
             }
 
-            if ($line == 'Category Note Amount') {
+            if (preg_match('/Category\s+Note\s+Amount/', $line)) {
                 $adjustmentsStart = $i + 1;
             }
 
-            if (preg_match('/Total Adjustments/', $line)) {
+            if (preg_match('/Total\s+Adjustments/', $line)) {
                 $adjustmentsFinish = $i - 1;
             }
 
@@ -121,7 +121,7 @@ class Invoice {
         $matches = [];
         for ($i = 0; $i < count($shifts); $i++) {
 
-            if (preg_match('/([a-zA-Z]+ [0-9]+ [a-zA-Z]+ [0-9]{4}) ([0-9]{2}:[0-9]{2}) ([0-9]{2}:[0-9]{2}) [0-9]\.[0-9]h ([0-9]+): .([[0-9]+\.[0-9]+)/', $shifts[$i], $matches)) {
+            if (preg_match('/([a-zA-Z]+\s+[0-9]+\s+[a-zA-Z]+\s+[0-9]{4})\s+([0-9]{2}:[0-9]{2})\s+([0-9]{2}:[0-9]{2})\s+[0-9]\.[0-9]h\s+([0-9]+):\s+.([[0-9]+\.[0-9]+)/', $shifts[$i], $matches)) {
                 $this->shifts[] = new Shift(
                     new DateTime($matches[1] . ' ' . $matches[2]),
                     new DateTime($matches[1] . ' ' . $matches[3]),
@@ -142,10 +142,10 @@ class Invoice {
         $matches = [];
         for ($i = 0; $i < count($adjustments); $i++) {
 
-            if (preg_match('/[0-9]+\.[0-9]+$/', $adjustments[$i], $matches)) {
+            if (preg_match('/[0-9]+\.[0-9]{2}/', $adjustments[$i], $matches)) {
                 $this->adjustments[] = new Adjustment(
                     $matches[0],
-                    preg_replace('/.[0-9]+\.[0-9]+$/', '', $adjustments[$i]));
+                    preg_replace('/.[0-9]+\.[0-9]{2}/', '', $adjustments[$i]));
             } else if ($i + 1 < count($adjustments)) {
                 $adjustments[$i + 1] = $adjustments[$i] . ' ' . $adjustments[$i + 1];
             }
@@ -234,6 +234,20 @@ class Invoice {
      */
     public function setAdjustments(array $adjustments): void {
         $this->adjustments = $adjustments;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAnonymised(): bool {
+        return $this->anonymised;
+    }
+
+    /**
+     * @param bool $anonymised
+     */
+    public function setAnonymised(bool $anonymised): void {
+        $this->anonymised = $anonymised;
     }
 
     /**
