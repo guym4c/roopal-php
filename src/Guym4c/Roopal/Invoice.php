@@ -106,7 +106,10 @@ class Invoice {
         $this->shifts = [];
         $this->adjustments = [];
 
-        $this->parseShifts(array_slice($pdf, $shiftsStart, $shiftsFinish - $shiftsStart + 1));
+        if ($shiftsStart > 0 &&
+            $shiftsFinish > 0) {
+            $this->parseShifts(array_slice($pdf, $shiftsStart, $shiftsFinish - $shiftsStart + 1));
+        }
 
         $tips = $tips == null ? null : $pdf[$tips];
         $this->parseAdjustments(array_slice($pdf, $adjustmentsStart, $adjustmentsFinish - $adjustmentsStart + 1), $tips);
@@ -298,7 +301,7 @@ class Invoice {
 
     /**
      * @param Invoice[] $invoices
-     * @param string $outputPath
+     * @return string
      * @throws \League\Csv\CannotInsertRecord
      */
     public static function toCsv(array $invoices): string {
