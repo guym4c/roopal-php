@@ -72,17 +72,17 @@ class Invoice {
             }
 
             // Invoice dates
-            $matched = preg_match('/^Services provided - ([0-9]+[a-zA-Z\s]+[0-9]+) - ([0-9]+[a-zA-Z\s]+[0-9]+)/', $line, $matches);
+            $matched = preg_match('/^Services? (?:provided|Hours) - ([0-9]+[a-zA-Z\s]+[0-9]+) - ([0-9]+[a-zA-Z\s]+[0-9]+)/', $line, $matches);
             if ($matched) {
                 $this->dateFrom = new DateTime($matches[1]);
                 $this->dateTo = new DateTime($matches[2]);
             }
 
-            if (preg_match('/Worked\s+Orders\s+Delivered\s+Total/', $line)) {
+            if (preg_match('/Orders\s+Delivered\s+Total/', $line)) {
                 $shiftsStart = $i + 1;
             }
 
-            if (preg_match( '/Fee\s+Adjustments/', $line)) {
+            if (preg_match( '/(?:Fee|Payment)\s+Adjustments/', $line)) {
                 $shiftsFinish = $i - 1;
             }
 
@@ -106,7 +106,10 @@ class Invoice {
         $this->shifts = [];
         $this->adjustments = [];
 
-        $this->parseShifts(array_slice($pdf, $shiftsStart, $shiftsFinish - $shiftsStart + 1));
+        if ($shiftsStart > 0 &&
+            $shiftsFinish > 0) {
+            $this->parseShifts(array_slice($pdf, $shiftsStart, $shiftsFinish - $shiftsStart + 1));
+        }
 
         $tips = $tips == null ? null : $pdf[$tips];
         $this->parseAdjustments(array_slice($pdf, $adjustmentsStart, $adjustmentsFinish - $adjustmentsStart + 1), $tips);
@@ -142,10 +145,13 @@ class Invoice {
         $matches = [];
         for ($i = 0; $i < count($adjustments); $i++) {
 
-            if (preg_match('/[0-9]+\.[0-9]{2}/', $adjustments[$i], $matches)) {
-                $this->adjustments[] = new Adjustment(
-                    $matches[0],
-                    preg_replace('/.[0-9]+\.[0-9]{2}/', '', $adjustments[$i]));
+            if (preg_match('/-?[0-9]+\.[0-9]{2}/', $adjustments[$i], $matches)) {
+                $amount = (float) $matches[0];
+                if ($matches[0] != 0) {
+                    $this->adjustments[] = new Adjustment(
+                        $amount,
+                        preg_replace('/.[0-9]+\.[0-9]{2}/', '', $adjustments[$i]));
+                }
             } else if ($i + 1 < count($adjustments)) {
                 $adjustments[$i + 1] = $adjustments[$i] . ' ' . $adjustments[$i + 1];
             }
@@ -295,7 +301,7 @@ class Invoice {
 
     /**
      * @param Invoice[] $invoices
-     * @param string $outputPath
+     * @return string
      * @throws \League\Csv\CannotInsertRecord
      */
     public static function toCsv(array $invoices): string {
